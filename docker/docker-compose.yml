@@ -1,0 +1,44 @@
+version: '3.6'
+services:
+  mysql:
+    image: "mysql:latest"
+    container_name: mysql
+    restart: always
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+      - MYSQL_DATABASE=se
+    ports:
+      - "3306:3306"
+    expose:
+      - 3306
+
+  news_service:
+    build: ./news
+    container_name: news_service
+    depends_on:
+      - mysql
+    environment:
+      - WAIT_HOSTS=mysql:3306
+      - WAIT_HOSTS_TIMEOUT=300
+      - WAIT_SLEEP_INTERVAL=30
+      - WAIT_HOST_CONNECT_TIMEOUT=30
+      - RUST_LOG=info
+    ports: 
+      - "42222:42222"
+    expose:
+      - 42222
+
+  envoy_server:
+    build: ./envoy
+    container_name: envoy_server
+    depends_on: 
+      - news_service
+    environment:
+      - WAIT_HOSTS=mysql:3306
+      - WAIT_HOSTS_TIMEOUT=300
+      - WAIT_SLEEP_INTERVAL=30
+      - WAIT_HOST_CONNECT_TIMEOUT=30
+    ports: 
+      - "42221:42221"
+    expose:
+      - 42221

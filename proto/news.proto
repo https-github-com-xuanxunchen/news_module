@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package news;
+
+message Error {
+    int32 code = 1;
+    string message = 2;
+}
+
+// get_meta
+message GetMetaParam {
+    enum NewsCategory {
+        HOT = 0;
+        SOCIETY = 1;
+        ENTERTAINMENT = 2;
+        TECH = 3;
+        MILITARY = 4;
+        SPORTS = 5;
+        CAR = 6;
+        FINANCE = 7;
+        WORLD = 8;
+        FASHION = 9;
+        TRAVEL = 10;
+        DISCOVERY = 11;
+        BABY = 12;
+        REGIMEN = 13;
+        STORY = 14;
+        ESSAY = 15;
+        GAME = 16;
+        HISTORY = 17;
+        FOOD = 18;
+    }
+
+    NewsCategory category = 1;
+}
+
+message GetMetaResult {
+    message Meta {
+        repeated Info info = 1;
+    }
+    message Info {
+        string id = 1;
+        string title = 2;
+        int32 behot_time = 3;
+        string source = 4;
+        repeated string image_list = 5;
+    }
+    oneof result {
+        Meta meta = 1;
+        Error error = 2;
+    }
+}
+
+
+// get_content
+message GetContentParam {
+    string id = 1;
+}
+
+message GetContentResult {
+    oneof result {
+        string content = 1;
+        Error error = 2;
+    }
+}
+
+service News {
+    rpc get_meta(GetMetaParam) returns (GetMetaResult) {}
+    rpc get_content(GetContentParam) returns (GetContentResult) {}
+}
